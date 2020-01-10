@@ -8,7 +8,7 @@ The test infrastructure contains test assitant and test harness.
 
     ``` shell
     cd rainbow-planner
-    docker build -t cmumars/p3-cp1_rb -f Dockerfile .
+    docker build -t cmumars/p3-cp1_rb .
     ```
 ## Building test assistant and test harness
 1. Build `cmumars/cp1_ta`:
@@ -33,7 +33,7 @@ The test infrastructure contains test assitant and test harness.
 1. Run in cloud and save logs to AWS S3 bucket
     ``` shell
     cd th
-    CUR_EVAL_ID=<...> S3_PATH=<...> AWS_ACCESS_KEY=<...> AWS_SECRET_ACCESS_KEY=<...> ./test_run.sh | tee stdout.log
+    CUR_EVAL_ID=<...> SAVE_LOG_LOCALLY=False S3_PATH=<...> AWS_ACCESS_KEY=<...> AWS_SECRET_ACCESS_KEY=<...> ./test_run.sh | tee stdout.log
     ```
 
 2. Run a controlled machine and save logs locally there
