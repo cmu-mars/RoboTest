@@ -1,0 +1,56 @@
+version: '2'
+services:
+  # The TA instance
+  cp1_ta:
+    image: cmumars/cp1_ta
+    container_name: cp1_ta
+    hostname: cp1_ta
+    environment:
+      - "ROS_HOSTNAME=cp1_ta"
+      - "ROS_MASTER=http://cp1_ta:11311"
+      - "TA_PORT=${TA_PORT}"
+      - "TH_PORT=${TH_PORT}"
+      - "RAINBOW_WAIT_TIME=130"
+#      - "RAINBOW_DEBUG_MODE=1"
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_BUCKET_CP1_PATH=${S3_PATH}
+      - TEST_ID=${TEST_ID}
+    volumes:
+      - ./logs:/home/mars/logs
+      - ./roslogs:/home/mars/.ros/log
+      - ./cp1:/home/mars/cp1
+    ports: 
+      - ${TA_PORT}:5000
+      - 1044:1044
+    depends_on:
+      - cp1_th
+    expose:
+      - 5000
+      - 1044
+    command: bash -c "rm -f /tmp/.X11-lock && . ~/.bashrc && . ~/catkin_ws/entrypoint.sh && cd /usr/src/app && python3 -m swagger_server http://cp1_th:${TH_PORT}"
+
+  # The TH instance
+  # Assuming all testX.json are in tests directory and TEST_SPEC = <TEST_ID>.json
+  cp1_th:
+    image: cmumars/cp1_th
+    container_name: cp1_th
+    hostname: cp1_th
+    environment:
+      - "TA_PORT=${TA_PORT}"
+      - "TH_PORT=${TH_PORT}"
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_BUCKET_CP1_PATH=${S3_PATH}
+      - TEST_ID=${TEST_ID}
+      - TH_LOG_LEVEL=${TH_LOG_LEVEL}
+    ports:
+      - ${TH_PORT}:8081
+    volumes:
+      - ./tests:/tests 
+      - ./th_log:/logs
+
+    expose:
+      - 8081
+    # port 5000 is used below (not TA_PORT) because it seems the internal network port is used
+    command: bash -c "python3 th_server.py http://cp1_ta 5000 ./cp1_map.json /tests/${TEST_SPEC} /logs/"

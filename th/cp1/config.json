@@ -1,0 +1,8 @@
+{
+  "battery_capacity": 32823.0,
+  "charging_rate": 69.9555,
+  "utility": {
+    "energy": 0.5,
+    "timeliness": 0.5
+  }
+}

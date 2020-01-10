@@ -1,0 +1,74 @@
+{
+    "test_configuration": {
+        "level": "d",
+        "start-loc": "l3",
+        "target-locs": [
+            "l7",
+            "l4",
+            "l8",
+            "l2",
+            "l5",
+            "l9"
+        ],
+        "power-model": 0,
+        "discharge-budget": 5000
+    },
+    "perturbation": {
+        "nPerturbations": 8,
+        "Obstacles": {
+            "op_easy": 0,
+            "op_medium": 2,
+            "op_hard": 0
+        },
+        "BatterySets": {
+            "bp_easy": 0,
+            "bp_medium": 6,
+            "bp_hard": 0
+        },
+        "perturbSeqs": {
+            "Target1": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                },
+                {
+                    "type": "op_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target2": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target3": [],
+            "Target4": [
+                {
+                    "type": "op_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target5": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.5
+                }
+            ],
+            "Target6": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.5
+                },
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                },
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.4
+                }
+            ]
+        }
+    }
+}

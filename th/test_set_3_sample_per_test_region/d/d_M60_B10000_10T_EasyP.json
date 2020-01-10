@@ -1,0 +1,101 @@
+{
+    "test_configuration": {
+        "level": "d",
+        "start-loc": "l6",
+        "target-locs": [
+            "l3",
+            "l5",
+            "l1",
+            "l10",
+            "l5",
+            "l10",
+            "l3",
+            "l8",
+            "l3",
+            "l10"
+        ],
+        "power-model": 60,
+        "discharge-budget": 10000
+    },
+    "perturbation": {
+        "nPerturbations": 12,
+        "Obstacles": {
+            "op_easy": 3,
+            "op_medium": 0,
+            "op_hard": 0
+        },
+        "BatterySets": {
+            "bp_easy": 9,
+            "bp_medium": 0,
+            "bp_hard": 0
+        },
+        "perturbSeqs": {
+            "Target1": [
+                {
+                    "type": "op_easy",
+                    "ratio": 0.2
+                }
+            ],
+            "Target2": [
+                {
+                    "type": "op_easy",
+                    "ratio": 0
+                }
+            ],
+            "Target3": [
+                {
+                    "type": "bp_easy",
+                    "ratio": 0.2
+                }
+            ],
+            "Target4": [
+                {
+                    "type": "bp_easy",
+                    "ratio": 0.1
+                }
+            ],
+            "Target5": [
+                {
+                    "type": "bp_easy",
+                    "ratio": 0.2
+                },
+                {
+                    "type": "bp_easy",
+                    "ratio": 0.1
+                }
+            ],
+            "Target6": [
+                {
+                    "type": "bp_easy",
+                    "ratio": 0.1
+                },
+                {
+                    "type": "bp_easy",
+                    "ratio": 0
+                }
+            ],
+            "Target7": [],
+            "Target8": [
+                {
+                    "type": "op_easy",
+                    "ratio": 0.1
+                }
+            ],
+            "Target9": [
+                {
+                    "type": "bp_easy",
+                    "ratio": 0
+                },
+                {
+                    "type": "bp_easy",
+                    "ratio": 0
+                },
+                {
+                    "type": "bp_easy",
+                    "ratio": 0
+                }
+            ],
+            "Target10": []
+        }
+    }
+}

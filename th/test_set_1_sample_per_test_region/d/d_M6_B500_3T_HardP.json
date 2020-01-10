@@ -1,0 +1,50 @@
+{
+    "test_configuration": {
+        "level": "d",
+        "start-loc": "l7",
+        "target-locs": [
+            "l10",
+            "l9",
+            "l3"
+        ],
+        "power-model": 6,
+        "discharge-budget": 500
+    },
+    "perturbation": {
+        "nPerturbations": 4,
+        "Obstacles": {
+            "op_easy": 0,
+            "op_medium": 0,
+            "op_hard": 1
+        },
+        "BatterySets": {
+            "bp_easy": 0,
+            "bp_medium": 0,
+            "bp_hard": 3
+        },
+        "perturbSeqs": {
+            "Target1": [
+                {
+                    "type": "op_hard",
+                    "ratio": 0.7
+                }
+            ],
+            "Target2": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.7
+                }
+            ],
+            "Target3": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.7
+                },
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.6
+                }
+            ]
+        }
+    }
+}

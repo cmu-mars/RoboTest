@@ -1,0 +1,101 @@
+{
+    "test_configuration": {
+        "level": "c",
+        "start-loc": "l9",
+        "target-locs": [
+            "l2",
+            "l6",
+            "l4",
+            "l9",
+            "l2",
+            "l6",
+            "l10",
+            "l6",
+            "l4",
+            "l3"
+        ],
+        "power-model": 50,
+        "discharge-budget": 5000
+    },
+    "perturbation": {
+        "nPerturbations": 12,
+        "Obstacles": {
+            "op_easy": 0,
+            "op_medium": 0,
+            "op_hard": 3
+        },
+        "BatterySets": {
+            "bp_easy": 0,
+            "bp_medium": 0,
+            "bp_hard": 9
+        },
+        "perturbSeqs": {
+            "Target1": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.8
+                }
+            ],
+            "Target2": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.6
+                },
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.8
+                },
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.7
+                }
+            ],
+            "Target3": [],
+            "Target4": [
+                {
+                    "type": "op_hard",
+                    "ratio": 0.8
+                }
+            ],
+            "Target5": [],
+            "Target6": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.6
+                },
+                {
+                    "type": "op_hard",
+                    "ratio": 0.7
+                }
+            ],
+            "Target7": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.7
+                }
+            ],
+            "Target8": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.7
+                },
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.6
+                }
+            ],
+            "Target9": [
+                {
+                    "type": "bp_hard",
+                    "ratio": 0.7
+                }
+            ],
+            "Target10": [
+                {
+                    "type": "op_hard",
+                    "ratio": 0.7
+                }
+            ]
+        }
+    }
+}

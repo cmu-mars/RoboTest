@@ -1,0 +1,13 @@
+{
+    "test_configuration": {
+        "level": "a",
+        "start-loc": "l5",
+        "target-locs": [
+            "l10",
+            "l5"
+        ],
+        "power-model": 87,
+        "discharge-budget": 10
+    },
+    "perturbation": {}
+}
