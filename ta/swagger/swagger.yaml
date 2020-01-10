@@ -1,0 +1,258 @@
+---
+swagger: "2.0"
+info:
+  version: "0.1"
+  title: "cmu mars brass ta: phase 2, cp1"
+host: "brass-ta"
+schemes:
+- "http"
+paths:
+  /observe:
+    get:
+      tags:
+      - "default_controller"
+      description: "observe some of the current state of the robot for visualization\
+        \ and invariant checking for perturbation end points. n.b. this information\
+        \ is to be used strictly in a passive way; it is not to be used for evaluation\
+        \ of the test at all."
+      operationId: "controllers.default_controller.observe_get"
+      parameters: []
+      responses:
+        200:
+          description: "successfully computed the observation"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+        400:
+          description: "encountered an error while computing the observation"
+  /perturb/battery:
+    post:
+      tags:
+      - "default_controller"
+      description: "set the level of the battery in a currently running test. consistent\
+        \ with the monotonicity requirement for the power model, this cannot be more\
+        \ than the current amount of charge in the battery."
+      operationId: "controllers.default_controller.perturb_battery_post"
+      parameters:
+      - in: "body"
+        name: "Parameters"
+        required: false
+        schema:
+          $ref: "#/definitions/Parameters"
+      responses:
+        200:
+          description: "the battery has been set to the requested level"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+        400:
+          description: "an error was encountered while setting the battery"
+          schema:
+            $ref: "#/definitions/inline_response_400"
+  /perturb/place-obstacle:
+    post:
+      tags:
+      - "default_controller"
+      description: "if the test is running, then place an instance of the obstacle\
+        \ on the map"
+      operationId: "controllers.default_controller.perturb_place_obstacle_post"
+      parameters:
+      - in: "body"
+        name: "Parameters"
+        required: false
+        schema:
+          $ref: "#/definitions/Parameters_1"
+      responses:
+        200:
+          description: "the obstacle has been placed in the running test"
+          schema:
+            $ref: "#/definitions/inline_response_200_2"
+        400:
+          description: "an error was encountered while placing the obstacle."
+          schema:
+            $ref: "#/definitions/inline_response_400_1"
+  /perturb/remove-obstacle:
+    post:
+      tags:
+      - "default_controller"
+      description: "if the test is running, remove a previously placed obstacle from\
+        \ the map"
+      operationId: "controllers.default_controller.perturb_remove_obstacle_post"
+      parameters:
+      - in: "body"
+        name: "Parameters"
+        required: false
+        schema:
+          $ref: "#/definitions/Parameters_2"
+      responses:
+        200:
+          description: "the obstacle has been removed from the running test"
+          schema:
+            $ref: "#/definitions/inline_response_200_3"
+        400:
+          description: "an error was encountered while removing the obstacle."
+          schema:
+            $ref: "#/definitions/inline_response_400_2"
+  /start:
+    post:
+      tags:
+      - "default_controller"
+      description: "start the turtlebot on the mission"
+      operationId: "controllers.default_controller.start_post"
+      parameters: []
+      responses:
+        200:
+          description: "successfully started the mission"
+        400:
+          description: "encountered an error in starting the mission"
+          schema:
+            $ref: "#/definitions/inline_response_400_3"
+definitions:
+  inline_response_400_3:
+    properties:
+      message:
+        type: "string"
+        description: "human readable information about the error, if any can be provided"
+  Parameters:
+    type: "object"
+    required:
+    - "charge"
+    properties:
+      charge:
+        type: "number"
+        description: "the level to which the battery should be set, in mWh. cannot\
+          \ be more than the maximum given in the TH response to `/ready`."
+        minimum: 0.0
+  Parameters_1:
+    type: "object"
+    required:
+    - "x"
+    - "y"
+    properties:
+      x:
+        type: "number"
+        format: "float"
+        description: "the x-coordinate of the center of the obstacle placement position"
+      y:
+        type: "number"
+        format: "float"
+        description: "the y-coordinate of the center of the obstacle placement position"
+  Parameters_2:
+    type: "object"
+    required:
+    - "obstacleid"
+    properties:
+      obstacleid:
+        type: "string"
+        description: "the obstacle ID given by /perturb/place-obstacle of the obstacle\
+          \ to be removed."
+  inline_response_200_1:
+    required:
+    - "sim-time"
+    properties:
+      sim-time:
+        type: "integer"
+        description: "the simulation time when the battery was set"
+  inline_response_200:
+    required:
+    - "battery"
+    - "sim-time"
+    - "x"
+    - "y"
+    properties:
+      x:
+        type: "number"
+        format: "float"
+        description: "the current x coordinate of the bot. must be within the boundaries\
+          \ of the map."
+      y:
+        type: "number"
+        format: "float"
+        description: "the current y coordinate of the bot. must be within the boundaries\
+          \ of the map."
+      battery:
+        type: "integer"
+        description: "the current charge of the battery, in mWh"
+        minimum: 0.0
+      sim-time:
+        type: "integer"
+        description: "the time when this observation was computed, in simulation seconds"
+        minimum: 0.0
+  inline_response_200_2:
+    required:
+    - "botright-x"
+    - "botright-y"
+    - "obstacleid"
+    - "sim-time"
+    - "topleft-x"
+    - "topleft-y"
+    properties:
+      obstacleid:
+        type: "string"
+        description: "a unique identifier for this particular placed obstacle, so\
+          \ that it can be removed in the future"
+      topleft-x:
+        type: "number"
+        format: "float"
+        description: "the x-coordinate of the top left corner of the bounding box\
+          \ of the placed obstacle"
+      topleft-y:
+        type: "number"
+        format: "float"
+        description: "the y-coordinate of the top left corner of the bounding box\
+          \ of the placed obstacle"
+      botright-x:
+        type: "number"
+        format: "float"
+        description: "the x-coordinate of the bottom right corner of the bounding\
+          \ box of the placed obstacle"
+      botright-y:
+        type: "number"
+        format: "float"
+        description: "the y-coordinate of the bottom right corner of the bounding\
+          \ box of the placed obstacle"
+      sim-time:
+        type: "integer"
+        description: "the simulation time when the obstacle was placed"
+  inline_response_200_3:
+    required:
+    - "sim-time"
+    properties:
+      sim-time:
+        type: "integer"
+        description: "the simulation time when the obstacle was placed"
+  inline_response_400_2:
+    required:
+    - "cause"
+    - "message"
+    properties:
+      cause:
+        type: "string"
+        description: "a reason for the error condition. `bad-obstacleid` is used if\
+          \ this endpoint is given a obstacleid in its parameters that was not given\
+          \ out by place-obstacle; `other-error` is used in all other instances."
+        enum:
+        - "bad-obstacleid"
+        - "other-error"
+      message:
+        type: "string"
+        description: "human readable info about what went wrong"
+  inline_response_400:
+    required:
+    - "message"
+    properties:
+      message:
+        type: "string"
+        description: "human readable info about what went wrong"
+  inline_response_400_1:
+    required:
+    - "cause"
+    - "message"
+    properties:
+      cause:
+        type: "string"
+        description: "a reason for the error condition"
+        enum:
+        - "bad-coordiantes"
+        - "other-error"
+      message:
+        type: "string"
+        description: "human readable info about what went wrong"

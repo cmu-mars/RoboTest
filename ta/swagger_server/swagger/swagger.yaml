@@ -1,0 +1,330 @@
+---
+swagger: "2.0"
+info:
+  version: "0.1"
+  title: "cmu mars brass ta: phase 2, cp1"
+host: "brass-ta"
+schemes:
+- "http"
+paths:
+  /perturb/place-obstacle:
+    post:
+      description: "if the test is running, then place an instance of the obstacle\
+        \ on the map"
+      operationId: "perturb_place_obstacle_post"
+      parameters:
+      - in: "body"
+        name: "PlaceParams"
+        required: false
+        schema:
+          $ref: "#/definitions/PlaceParams"
+      responses:
+        200:
+          description: "the obstacle has been placed in the running test"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+        400:
+          description: "an error was encountered while placing the obstacle."
+          schema:
+            $ref: "#/definitions/inline_response_400"
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+  /perturb/remove-obstacle:
+    post:
+      description: "if the test is running, remove a previously placed obstacle from\
+        \ the map"
+      operationId: "perturb_remove_obstacle_post"
+      parameters:
+      - in: "body"
+        name: "RemoveParams"
+        required: false
+        schema:
+          $ref: "#/definitions/RemoveParams"
+      responses:
+        200:
+          description: "the obstacle has been removed from the running test"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+        400:
+          description: "an error was encountered while removing the obstacle."
+          schema:
+            $ref: "#/definitions/inline_response_400_1"
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+  /perturb/battery:
+    post:
+      description: "set the level of the battery in a currently running test. consistent\
+        \ with the monotonicity requirement for the power model, this cannot be more\
+        \ than the current amount of charge in the battery."
+      operationId: "perturb_battery_post"
+      parameters:
+      - in: "body"
+        name: "BatteryParams"
+        required: false
+        schema:
+          $ref: "#/definitions/BatteryParams"
+      responses:
+        200:
+          description: "the battery has been set to the requested level"
+          schema:
+            $ref: "#/definitions/inline_response_200_2"
+        400:
+          description: "an error was encountered while setting the battery"
+          schema:
+            $ref: "#/definitions/inline_response_400_2"
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+  /start:
+    post:
+      description: "start the turtlebot on the mission"
+      operationId: "start_post"
+      parameters: []
+      responses:
+        200:
+          description: "successfully started the mission"
+        400:
+          description: "encountered an error in starting the mission"
+          schema:
+            $ref: "#/definitions/inline_response_400_3"
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+  /observe:
+    get:
+      description: "observe some of the current state of the robot for visualization\
+        \ and invariant checking for perturbation end points. n.b. this information\
+        \ is to be used strictly in a passive way; it is not to be used for evaluation\
+        \ of the test at all."
+      operationId: "observe_get"
+      parameters: []
+      responses:
+        200:
+          description: "successfully computed the observation"
+          schema:
+            $ref: "#/definitions/inline_response_200_3"
+        400:
+          description: "encountered an error while computing the observation"
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+  /internal-status:
+    post:
+      description: "reports any internal status (including the error that may occured)\
+        \ from the backend that might be sent to the TA for internal bookeeping or\
+        \ forwarding to the TH"
+      operationId: "internal_status_post"
+      parameters:
+      - in: "body"
+        name: "CP1InternalStatus"
+        required: true
+        schema:
+          $ref: "#/definitions/CP1InternalStatus"
+      responses:
+        200:
+          description: "TA acknowledges the status of the SUT"
+          schema:
+            $ref: "#/definitions/internal_status_response_200"
+        400:
+          description: "TA has encountered an error in processing the status of the\
+            \ SUT."
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+definitions:
+  inline_response_400_3:
+    properties:
+      message:
+        type: "string"
+        description: "human readable information about the error, if any can be provided"
+  CP1InternalStatus:
+    type: "object"
+    required:
+    - "message"
+    - "status"
+    properties:
+      status:
+        type: "string"
+        description: "one of the possible status codes\
+          \ * offline-learning-started - the offline learning phase has started\
+          \ * offline-learning-done - the offline  learning phase has been done\
+          \ * online-learning-started - the online learning phase has started\
+          \ * online-learning-done - the online  learning phase has been done\
+          \ * adapt-started - the SUT has started adapting and cannot be perturbed\
+          \ * adapt-done - the SUT has finished adapting\
+          \ * charging-started - the turtlebot is currently charging\
+          \ * charging-done - the turtlebot has stopped charging\
+          \ * parsing-error - one or more of the function descriptions failed to parse\
+          \ * learning-error - an error was encountered in learning one or more of the hidden functions\
+          \ * other-error - an error was encountered that is not covered by the other error codees"
+        enum:
+        - "offline-learning-started"
+        - "offline-learning-done"
+        - "online-learning-started"
+        - "online-learning-done"
+        - "adapt-started"
+        - "adapt-done"
+        - "charging-started"
+        - "charging-done"
+        - "parsing-error"
+        - "learning-error"
+        - "other-error"
+        - "RAINBOW_READY"
+        - "MISSION_SUCCEEDED"
+        - "MISSION_FAILED"
+        - "ADAPTING"
+        - "ADAPTED"
+        - "ADAPTED_FAILED"
+        - "PLAN"
+        - "learning-requested"
+      message:
+        type: "string"
+        description: "human readable text describing the status, if any"
+      sim-time:
+        type: "integer"
+        description: "the simulation time the status message was produced, for some\
+          \ siutations like learning-* we do not have simulation time because the\
+          \ simulation has not been started"
+        minimum: 0
+    example:
+      sim-time: 0
+      message: "message"
+      status: "learning-started"
+  BatteryParams:
+    type: "object"
+    required:
+    - "charge"
+    properties:
+      charge:
+        type: "number"
+        description: "the level to which the battery should be set, in mWh. cannot\
+          \ be more than the maximum charge for the power model specified in the THs\
+          \ response to `/ready`."
+        minimum: 0
+    example:
+      charge: 0.080082819046101150206595775671303272247314453125
+  PlaceParams:
+    type: "object"
+    required:
+    - "x"
+    - "y"
+    properties:
+      x:
+        type: "number"
+        format: "float"
+        description: "the x-coordinate of the center of the obstacle placement position"
+      y:
+        type: "number"
+        format: "float"
+        description: "the y-coordinate of the center of the obstacle placement position"
+    example:
+      x: 0.8008282
+      y: 6.0274563
+  RemoveParams:
+    type: "object"
+    required:
+    - "obstacleid"
+    properties:
+      obstacleid:
+        type: "string"
+        description: "the obstacle ID given by /perturb/place-obstacle of the obstacle\
+          \ to be removed."
+    example:
+      obstacleid: "obstacleid"
+  inline_response_200_1:
+    required:
+    - "sim-time"
+    properties:
+      sim-time:
+        type: "integer"
+        description: "the simulation time when the obstacle was placed"
+    example:
+      sim-time: 0
+  internal_status_response_200:
+    properties:
+      success:
+        type: "boolean"
+        description: "Whether the command was a success. Currently only used by learning-requested"
+    example:
+      success: true
+  inline_response_200:
+    required:
+    - "obstacleid"
+    - "sim-time"
+    properties:
+      obstacleid:
+        type: "string"
+        description: "a unique identifier for this particular placed obstacle, so\
+          \ that it can be removed in the future"
+      sim-time:
+        type: "integer"
+        description: "the simulation time when the obstacle was placed"
+    example:
+      sim-time: 0
+      obstacleid: "obstacleid"
+  inline_response_200_2:
+    required:
+    - "sim-time"
+    properties:
+      sim-time:
+        type: "integer"
+        description: "the simulation time when the battery was set"
+    example:
+      sim-time: 0
+  inline_response_200_3:
+    required:
+    - "battery"
+    - "sim-time"
+    - "x"
+    - "y"
+    properties:
+      x:
+        type: "number"
+        format: "float"
+        description: "the current x coordinate of the bot. must be within the boundaries\
+          \ of the map."
+      y:
+        type: "number"
+        format: "float"
+        description: "the current y coordinate of the bot. must be within the boundaries\
+          \ of the map."
+      battery:
+        type: "integer"
+        description: "the current charge of the battery, in mWh"
+        minimum: 0
+      sim-time:
+        type: "integer"
+        description: "the time when this observation was computed, in simulation seconds"
+        minimum: 0
+    example:
+      sim-time: 0
+      x: 0.8008282
+      y: 6.0274563
+      battery: 0
+  inline_response_400_2:
+    required:
+    - "message"
+    properties:
+      message:
+        type: "string"
+        description: "human readable info about what went wrong"
+  inline_response_400:
+    required:
+    - "cause"
+    - "message"
+    properties:
+      cause:
+        type: "string"
+        description: "a reason for the error condition"
+        enum:
+        - "bad-coordiantes"
+        - "other-error"
+      message:
+        type: "string"
+        description: "human readable info about what went wrong"
+  inline_response_400_1:
+    required:
+    - "cause"
+    - "message"
+    properties:
+      cause:
+        type: "string"
+        description: "a reason for the error condition. `bad-obstacleid` is used if\
+          \ this endpoint is given a obstacleid in its parameters that was not given\
+          \ out by place-obstacle; `other-error` is used in all other instances."
+        enum:
+        - "bad-obstacleid"
+        - "other-error"
+      message:
+        type: "string"
+        description: "human readable info about what went wrong"

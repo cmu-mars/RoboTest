@@ -1,0 +1,41 @@
+# https://answers.ros.org/question/253832/docker-how-to-make-sure-nodes-start-after-master/
+# see: https://github.com/toddsampson/ros-docker/blob/master/docker-compose.yml
+# https://github.com/LI3DS/ros-li3ds/blob/master/docker-compose.yml
+# http://jaredmmoore.com/rosgazebo-genetic-algorithms-and-multiple-instances/
+# https://answers.ros.org/question/154511/fast-headless-robot-simulator/
+# https://bitbucket.org/osrf/gazebo/issues/1837/vmware-rendering-z-ordering-appears-random
+# https://github.com/leonid-shevtsov/headless/issues/47
+#
+# Note: The `expose` command is used to expose a given port on a specific
+#       container to the wider internal network (i.e., not the host machine).
+#       Ports may be forwarded to the host network using the "ports" command.
+#
+      # - "TH_PORT=`echo ${TH_URI} | awk -F ':' '{print $NF}'`"
+version: '2'
+services:
+  cp1_th:
+    image: docker.darpa-brass.com/ll/cmur-harness
+    container_name: cp1_th
+    hostname: cp1_th
+    environment:
+      - "TA_PORT=${TA_PORT}"
+      - "TH_PORT=${TH_PORT}"
+    ports:
+      - ${TH_PORT}:${TH_PORT}
+    command: --cp CP1 --thPort ${TH_PORT} --taHost cp1_ta --taPort 5000
+
+  cp1_ta:
+    image: cmu-mars/cp1
+    container_name: cp1_ta
+    hostname: cp1_ta
+    environment:
+      - "ROS_HOSTNAME=cp1_ta"
+      - "ROS_MASTER_URI=http://cp1_ta:11311"
+      - "TA_PORT=${TA_PORT}"
+    ports:
+      - ${TA_PORT}:5000
+    depends_on:
+      - cp1_th
+    expose:
+      - 5000
+    command: bash -c ". ~/.bashrc && . ~/catkin_ws/entrypoint.sh && cd /usr/src/app && python3 -u -m swagger_server http://cp1_th:${TH_PORT}"

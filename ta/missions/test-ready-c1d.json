@@ -1,0 +1,7 @@
+{
+  "discharge-budget": 5000,
+  "level": "c",
+  "power-model": 55,
+  "start-loc": "l10",
+  "target-locs": ["l2","l4","l5","l4","l1","l4","l1","l4","l9","l5"]
+}
