@@ -122,11 +122,17 @@ def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID
 
 # Test Space Split
 #Suggested budget space
-budget_space = [ 10, 50, 100, 500, 1000, 5000, 10000]
+#budget_space = [ 10, 50, 100, 500, 1000, 5000, 10000]
+budget_space = [10, 25, 50, 100, 150, 200, 250]
+#power_model_space = [
+#        list(range(0, 25)),
+#        list(range(25, 75)),
+#        list(range(75, 99))]
 power_model_space = [
-        list(range(0, 25)),
-        list(range(25, 75)),
-        list(range(75, 99))]
+        np.load("easy_power_model_IDs.npy").tolist(),
+        np.load("medium_power_model_IDs.npy").tolist(),
+        np.load("difficult_power_model_IDs.npy").tolist(),
+        ]
 target_space = [
         [1, 2, 3],
         [4, 5, 6, 7],
