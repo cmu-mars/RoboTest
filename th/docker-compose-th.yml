@@ -2,7 +2,7 @@ version: '2'
 services:
   # The TA instance
   cp1_ta:
-    image: cmumars/cp1_ta
+    image: cmumars/cp1_ta_seams2020
     container_name: cp1_ta
     hostname: cp1_ta
     environment:
@@ -33,7 +33,7 @@ services:
   # The TH instance
   # Assuming all testX.json are in tests directory and TEST_SPEC = <TEST_ID>.json
   cp1_th:
-    image: cmumars/cp1_th
+    image: cmumars/cp1_th_seams2020
     container_name: cp1_th
     hostname: cp1_th
     environment:
