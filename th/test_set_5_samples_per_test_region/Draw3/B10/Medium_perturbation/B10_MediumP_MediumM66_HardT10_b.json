@@ -1,0 +1,100 @@
+{
+    "test_configuration": {
+        "level": "b",
+        "start-loc": "l5",
+        "target-locs": [
+            "l1",
+            "l5",
+            "l6",
+            "l7",
+            "l1",
+            "l3",
+            "l10",
+            "l3",
+            "l4",
+            "l10"
+        ],
+        "power-model": 66,
+        "discharge-budget": 10
+    },
+    "perturbation": {
+        "nPerturbations": 12,
+        "Obstacles": {
+            "op_easy": 0,
+            "op_medium": 3,
+            "op_hard": 0
+        },
+        "BatterySets": {
+            "bp_easy": 0,
+            "bp_medium": 9,
+            "bp_hard": 0
+        },
+        "perturbSeqs": {
+            "Target1": [],
+            "Target2": [],
+            "Target3": [
+                {
+                    "type": "op_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target4": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.5
+                }
+            ],
+            "Target5": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target6": [],
+            "Target7": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                },
+                {
+                    "type": "op_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target8": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                },
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                },
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.5
+                }
+            ],
+            "Target9": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                }
+            ],
+            "Target10": [
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.4
+                },
+                {
+                    "type": "op_medium",
+                    "ratio": 0.3
+                },
+                {
+                    "type": "bp_medium",
+                    "ratio": 0.3
+                }
+            ]
+        }
+    }
+}
