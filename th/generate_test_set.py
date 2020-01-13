@@ -161,7 +161,7 @@ levels = ['a', 'b', 'c', 'd']
 # each tuple is different.
 def draw_n_tuples(num_samples_per_region, power_model_range, num_targets_range):
     result = [[], []]
-    result[0] = np.random.choice(power_model_range, num_samples_per_region)
+    result[0] = np.random.choice(power_model_range, num_samples_per_region, replace=False)
     result[1] = np.random.choice(num_targets_range, num_samples_per_region)
     '''
     for _ in range(num_samples_per_region):
@@ -175,15 +175,18 @@ def draw_n_tuples(num_samples_per_region, power_model_range, num_targets_range):
     '''
     return result
     
-
+# IDs of selected power models
+selected_PM_IDs = np.zeros((3, num_samples_per_region))
 # A test squad for case a, b, c and d.
 test_squads = []
 # The following code pick ONE test sample from each of the splited range.
 # Suggest to draw 3-5 test samples from each splited range.
 for budget in budget_space:
-    for pm_range in power_model_space:
+    for pm_range_ID in range(len(power_model_space)):
+        pm_range = power_model_space[pm_range_ID]
         for num_targets_range in target_space:
             pm_targets_list = draw_n_tuples(num_samples_per_region, pm_range, num_targets_range)
+            selected_PM_IDs[pm_range_ID] = pm_targets_list[0]
             for draw_ID in range(num_samples_per_region):
                 pm_ID = pm_targets_list[0][draw_ID]
                 num_targets = pm_targets_list[1][draw_ID]
@@ -217,6 +220,16 @@ if separate_store:
     create_subfolds(test_spec_fold, budget_space, perturbation_difficulty_space, power_model_complexities, target_num_levels, levels, draw_IDs)
 
 
+# selected_PM_IDs: (3, num_samples_per_region)
+# selected_PM_IDs[0]: easy power models
+# selected_PM_IDs[1]: medium power models
+# selected_PM_IDs[2]: hard power models
+np.save(os.path.join(test_spec_fold, "selected_PM_IDs.npy"), selected_PM_IDs.astype(int))
+selected_PM_IDs = selected_PM_IDs.astype(int)
+print("Selected Power Models:")
+print("Easy Models: {}".format(selected_PM_IDs[0]))
+print("Medium Models: {}".format(selected_PM_IDs[1]))
+print("Hard Models: {}".format(selected_PM_IDs[2]))
 
 # Create test spec for each test
 for test in test_squads:
