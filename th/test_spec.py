@@ -1,5 +1,6 @@
 import json
 import random
+import numpy as np
 
 testRanges = {
         "nTargets"      : (1, 10),
@@ -127,7 +128,16 @@ def generate_list_of_perturbation_sequences(nTargets, obstacles, batterySets):
     return perturbSeqs
 
 
-
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NpEncoder, self).default(obj)
 
 class TestSpec():
     def __init__(self, testMap, level, startLoc, targetLocList, powerModelID, budget, obstacles, batterySets, perturbSeqs):
@@ -196,7 +206,7 @@ class TestSpec():
             spec["perturbation"]["perturbSeqs"]     = self.perturbSeqs
 
         with open(filepath, "w") as fp:
-            json.dump(spec, fp, indent=4)    
+            json.dump(spec, fp, indent=4, cls=NpEncoder)    
 
     def isInRange(self, num, testRange):
         '''
@@ -209,19 +219,19 @@ class TestSpec():
             return False
 
     def rangeValidityCheck(self):
-        if not isinstance(self.nTargets, int) or not self.isInRange(self.nTargets, testRanges["nTargets"]):
+        if not isinstance(self.nTargets, (int, np.integer)) or not self.isInRange(self.nTargets, testRanges["nTargets"]):
             raise ValueError("The given value ({}) of 'nTargets' is either not an integer or not in the range [{}, {}]".format(
                 self.nTargets, testRanges["nTargets"][0], testRanges["nTargets"][1]))
-        elif not isinstance(self.powerModelID, int) or not self.isInRange(self.powerModelID, testRanges["powerModelID"]):
+        elif not isinstance(self.powerModelID, (int, np.integer)) or not self.isInRange(self.powerModelID, testRanges["powerModelID"]):
             raise ValueError("The given value ({}) of 'powerModelID' is either not an integer or not in the range [{}, {}]".format(
                 self.powerModelID, testRanges["powerModelID"][0], testRanges["powerModelID"][1]))
-        elif not isinstance(self.nObstacles, int) or not self.isInRange(self.nObstacles, (0, self.nTargets)): # at most one obstacel should be placed per target. Otherwise, the robot will fail to find alternative route.
+        elif not isinstance(self.nObstacles, (int, np.integer)) or not self.isInRange(self.nObstacles, (0, self.nTargets)): # at most one obstacel should be placed per target. Otherwise, the robot will fail to find alternative route.
             raise ValueError("The given value ({}) of 'nObstacles' is either not an integer or not in the range [{}, {}]".format(
                 self.nObstacles, testRanges["nObstacles"][0], testRanges["nObstacles"][1]))
-        elif not isinstance(self.nBatterySets, int) or not self.isInRange(self.nBatterySets, testRanges["nBatterySets"]):
+        elif not isinstance(self.nBatterySets, (int, np.integer)) or not self.isInRange(self.nBatterySets, testRanges["nBatterySets"]):
             raise ValueError("The given value ({}) of 'nBatterySets' is either not an integer or not in the range [{}, {}]".format(
                 self.nBatterySets, testRanges["nBatterySets"][0], testRanges["nBatterySets"][1]))
-        elif not isinstance(self.budget, int) or not self.isInRange(self.budget, testRanges["budget"]):
+        elif not isinstance(self.budget, (int, np.integer)) or not self.isInRange(self.budget, testRanges["budget"]):
             raise ValueError("The given value ({}) of 'budget' is either not an integer or not in the range [{}, {}]".format(
                 self.budget, testRanges["budget"][0], testRanges["budget"][1]))
 

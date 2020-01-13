@@ -32,18 +32,23 @@ waypoints.remove('l12')
 
 
 # If there is change, create_subfolds() and get_subfold_name() should be changed accordingly
-def create_subfolds(test_spec_fold, budgets, perturbation_severities, power_model_complexities, target_num_levels, case_levels):
-    for budget in budgets:
-        budget_fp = os.path.join(test_spec_fold, "B"+str(budget))
-        if not os.path.exists(budget_fp):
-            os.makedirs(budget_fp)
-        for perturbation_severity in perturbation_severities:
-            perturbation_fp = os.path.join(budget_fp, perturbation_severity+"_perturbation")
-            if not os.path.exists(perturbation_fp):
-                os.makedirs(perturbation_fp)
+def create_subfolds(test_spec_fold, budgets, perturbation_severities, power_model_complexities, target_num_levels, case_levels, draw_IDs):
+    for draw_ID in draw_IDs:
+        draw_fp = os.path.join(test_spec_fold, "Draw"+str(draw_ID))
+        if not os.path.exists(draw_fp):
+            os.makedirs(draw_fp)
+        for budget in budgets:
+            budget_fp = os.path.join(draw_fp, "B"+str(budget))
+            if not os.path.exists(budget_fp):
+                os.makedirs(budget_fp)
+            for perturbation_severity in perturbation_severities:
+                perturbation_fp = os.path.join(budget_fp, perturbation_severity+"_perturbation")
+                if not os.path.exists(perturbation_fp):
+                    os.makedirs(perturbation_fp)
 
-def get_subfold_name(test_spec_fold, budget, perturbation_severity, power_model_complexity, target_num_level, case_level):
-    fp = os.path.join(test_spec_fold, "B"+str(budget))
+def get_subfold_name(test_spec_fold, budget, perturbation_severity, power_model_complexity, target_num_level, case_level, draw_ID):
+    fp = os.path.join(test_spec_fold, "Draw"+str(draw_ID))
+    fp = os.path.join(fp, "B"+str(budget))
     fp = os.path.join(fp, perturbation_severity+"_perturbation")
     return fp
 
@@ -59,7 +64,7 @@ def find_level(ID, space):
 
 
 
-def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID, budget, levels, perturbations):
+def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID, budget, levels, perturbations, draw_ID):
     '''
         levels: list of case levels, [a, b, c, d]
     '''
@@ -123,7 +128,7 @@ def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID
                 case_level)
 
         if separate_store:
-            subfold_path = get_subfold_name(test_spec_fold, budget, perturbation_severity, power_model_complexity, target_num_level, case_level)
+            subfold_path = get_subfold_name(test_spec_fold, budget, perturbation_severity, power_model_complexity, target_num_level, case_level, draw_ID)
             test_spec_fp = os.path.join(subfold_path, test_spec_fn)
         else:
             test_spec_fp = os.path.join(test_spec_fold, test_spec_fn)
@@ -138,9 +143,9 @@ budget_space = [10, 25, 50, 100, 150, 200, 250]
 #        list(range(25, 75)),
 #        list(range(75, 99))]
 power_model_space = [
-        np.load("easy_power_model_IDs.npy").tolist(),
-        np.load("medium_power_model_IDs.npy").tolist(),
-        np.load("difficult_power_model_IDs.npy").tolist(),
+        np.load("easy_power_model_IDs.npy").astype(np.int).tolist(),
+        np.load("medium_power_model_IDs.npy").astype(np.int).tolist(),
+        np.load("difficult_power_model_IDs.npy").astype(np.int).tolist(),
         ]
 target_space = [
         [1, 2, 3],
@@ -156,6 +161,9 @@ levels = ['a', 'b', 'c', 'd']
 # each tuple is different.
 def draw_n_tuples(num_samples_per_region, power_model_range, num_targets_range):
     result = [[], []]
+    result[0] = np.random.choice(power_model_range, num_samples_per_region)
+    result[1] = np.random.choice(num_targets_range, num_samples_per_region)
+    '''
     for _ in range(num_samples_per_region):
         num_targets = random.choice(num_targets_range)
         result[1].append(num_targets)
@@ -164,6 +172,7 @@ def draw_n_tuples(num_samples_per_region, power_model_range, num_targets_range):
             if pm_ID not in result[0]: # a new power model ID
                 result[0].append(pm_ID)
                 break
+    '''
     return result
     
 
@@ -175,14 +184,15 @@ for budget in budget_space:
     for pm_range in power_model_space:
         for num_targets_range in target_space:
             pm_targets_list = draw_n_tuples(num_samples_per_region, pm_range, num_targets_range)
-            for sample_Idx in range(num_samples_per_region):
-                pm_ID = pm_targets_list[0][sample_Idx]
-                num_targets = pm_targets_list[1][sample_Idx]
+            for draw_ID in range(num_samples_per_region):
+                pm_ID = pm_targets_list[0][draw_ID]
+                num_targets = pm_targets_list[1][draw_ID]
 
                 num_perturbation_difficulties = len(perturbation_difficulty_space)
                 for perturbation_difficulty_idx in range(num_perturbation_difficulties):
                     perturbation_severity   = perturbation_difficulty_space[perturbation_difficulty_idx]
                     test = {}
+                    test['draw_ID']        = draw_ID + 1 # make it as 1-based
                     test['levels']          = levels
                     test['num_targets']     = num_targets
                     test['power_model_ID']  = pm_ID
@@ -201,9 +211,10 @@ for budget in budget_space:
 separate_store = True
 if separate_store:
     # set up directory for storing test specification files
+    draw_IDs = list(range(1, 1+num_samples_per_region))
     power_model_complexities = ["Easy", "Medium", "Hard"]
     target_num_levels = ["Easy", "Medium", "Hard"]
-    create_subfolds(test_spec_fold, budget_space, perturbation_difficulty_space, power_model_complexities, target_num_levels, levels)
+    create_subfolds(test_spec_fold, budget_space, perturbation_difficulty_space, power_model_complexities, target_num_levels, levels, draw_IDs)
 
 
 
