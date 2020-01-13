@@ -5,6 +5,7 @@ import time
 import datetime
 import json
 import copy
+import numpy as np
 
 from mapserver import MapServer
 from test_spec import TestSpec, testRanges, generate_list_of_perturbation_sequences, perturbation_severities
@@ -30,10 +31,37 @@ waypoints.remove('l11')
 waypoints.remove('l12')
 
 
+# If there is change, create_subfolds() and get_subfold_name() should be changed accordingly
+def create_subfolds(test_spec_fold, budgets, perturbation_severities, power_model_complexities, target_num_levels, case_levels):
+    for budget in budgets:
+        budget_fp = os.path.join(test_spec_fold, "B"+str(budget))
+        if not os.path.exists(budget_fp):
+            os.makedirs(budget_fp)
+        for perturbation_severity in perturbation_severities:
+            perturbation_fp = os.path.join(budget_fp, perturbation_severity+"_perturbation")
+            if not os.path.exists(perturbation_fp):
+                os.makedirs(perturbation_fp)
+
+def get_subfold_name(test_spec_fold, budget, perturbation_severity, power_model_complexity, target_num_level, case_level):
+    fp = os.path.join(test_spec_fold, "B"+str(budget))
+    fp = os.path.join(fp, perturbation_severity+"_perturbation")
+    return fp
+
+
+
+def find_level(ID, space):
+    if ID in space[0]:
+        return "Easy"
+    elif ID in space[1]:
+        return "Medium"
+    else:
+        return "Hard"
+
+
+
 def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID, budget, levels, perturbations):
     '''
-        separate_store: if True, store each case's test spec in test_spec_fold/case_level. 'case_level' is a value from 'levels' list
-                        assume this subdirectory exists.
+        levels: list of case levels, [a, b, c, d]
     '''
     global waypoints
     global map_server
@@ -71,10 +99,10 @@ def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID
 
     perturb_seqs = generate_list_of_perturbation_sequences(num_targets, obstacles, battery_sets)
 
-    for level in levels:
+    for case_level in levels:
         test_spec = TestSpec(
                 map_server,
-                level,
+                case_level,
                 start_loc,
                 target_loc_list,
                 power_model_ID,
@@ -83,39 +111,20 @@ def create_test_spec(separate_store, test_spec_fold, num_targets, power_model_ID
                 battery_sets,
                 perturb_seqs)
 
-        if perturbation_severity != None: 
-            if level != 'a': # case a has no perturbation
-                test_spec_fn = "{}_M{}_B{}_{}T_{}P.json".format(
-                        level,
-                        power_model_ID,
-                        budget,
-                        num_targets,
-                        perturbation_severity)
-            else:
-                test_spec_fn = "{}_M{}_B{}_{}T.json".format(
-                                        level,
-                                        power_model_ID,
-                                        budget,
-                                        num_targets)
-        else: # For complicated test design
-            test_spec_fn = "{}_M{}_B{}_{}T_{}OP{}E{}M{}H_{}BP{}E{}M{}H.json".format(
-                    level,
-                    power_model_ID,
-                    budget,
-                    num_targets,
-                    num_obstacles,
-                    num_obstacles_easy,
-                    num_obstacles_medium,
-                    num_obstacles_hard,
-                    num_battery_sets,
-                    num_battery_sets_easy,
-                    num_battery_sets_medium,
-                    num_battery_sets_hard)
-
+        power_model_complexity = find_level(power_model_ID, power_model_space) 
+        target_num_level = find_level(num_targets, target_space)
+        test_spec_fn = "B{}_{}P_{}M{}_{}T{}_{}.json".format(
+                budget,
+                perturbation_severity,
+                power_model_complexity,
+                power_model_ID,
+                target_num_level,
+                num_targets,
+                case_level)
 
         if separate_store:
-            subfold = os.path.join(test_spec_fold, level)
-            test_spec_fp = os.path.join(subfold, test_spec_fn)
+            subfold_path = get_subfold_name(test_spec_fold, budget, perturbation_severity, power_model_complexity, target_num_level, case_level)
+            test_spec_fp = os.path.join(subfold_path, test_spec_fn)
         else:
             test_spec_fp = os.path.join(test_spec_fold, test_spec_fn)
         test_spec.writeSpecToFile(test_spec_fp)
@@ -139,15 +148,8 @@ target_space = [
         [8, 9, 10]]
 perturbation_difficulty_space = ["Easy", "Medium", "Hard"]
 
-# if it is desired to put all test specs of one case in one fold,
-# please ensure the sub-dierctory 'test_spec_fold/<case_level>' is created by running this script.
+# case levels
 levels = ['a', 'b', 'c', 'd']
-
-# set up directory for storing test specification files
-for level in levels:
-    directory = os.path.join(test_spec_fold, level)
-    if not os.path.exists(directory):
-        os.makedirs(directory)    
 
 # draw a list of 2-tuples: (power model ID, num of targets)
 # Make each tuple's power model ID is different to ensure
@@ -197,6 +199,14 @@ for budget in budget_space:
                     test_squads.append(test)
 
 separate_store = True
+if separate_store:
+    # set up directory for storing test specification files
+    power_model_complexities = ["Easy", "Medium", "Hard"]
+    target_num_levels = ["Easy", "Medium", "Hard"]
+    create_subfolds(test_spec_fold, budget_space, perturbation_difficulty_space, power_model_complexities, target_num_levels, levels)
+
+
+
 # Create test spec for each test
 for test in test_squads:
     create_test_spec(separate_store, test_spec_fold, **test)
