@@ -108,6 +108,7 @@ function monitor_ta_shutdown() {
     docker kill ${TH_CONTAINER_NAME}
 }
 
+
 # Ensure the environmental variable S3_PATH not ending with '/'
 S3_PATH=$(echo ${S3_PATH} | sed -e 's|/$||')
 echo -e "S3_PATH is ${S3_PATH}"
@@ -220,11 +221,11 @@ do
     TEST_RUN=$((TEST_RUN+1))
 done
 
-echo -e "\n[Analyze mission results]"
-python mission_result_analysis.py "${TEST_SPECS_DIR}" "${CUR_EVAL_DIR}"
+#echo -e "\n[Analyze mission results]"
+#python mission_result_analysis.py "${TEST_SPECS_DIR}" "${CUR_EVAL_DIR}"
 
-echo  -e "\n[Send evaluation result to S3 Bucket]"
-aws s3 cp "${CUR_EVAL_DIR}/collection_of_mission_result.json" "${S3_PATH}/${CUR_EVAL_ID}/"
-aws s3 cp "${CUR_EVAL_DIR}/evaluation_result.txt" "${S3_PATH}/${CUR_EVAL_ID}/"
-aws s3 cp "${CUR_EVAL_DIR}/mission_result_file_check.txt" "${S3_PATH}/${CUR_EVAL_ID}/"
+#echo  -e "\n[Send evaluation result to S3 Bucket]"
+#aws s3 cp "${CUR_EVAL_DIR}/collection_of_mission_result.json" "${S3_PATH}/${CUR_EVAL_ID}/"
+#aws s3 cp "${CUR_EVAL_DIR}/evaluation_result.txt" "${S3_PATH}/${CUR_EVAL_ID}/"
+#aws s3 cp "${CUR_EVAL_DIR}/mission_result_file_check.txt" "${S3_PATH}/${CUR_EVAL_ID}/"
 aws s3 cp "${MISSION_RESULTS_DIR}/" "${S3_PATH}/${CUR_EVAL_ID}/mission_results/" --recursive
