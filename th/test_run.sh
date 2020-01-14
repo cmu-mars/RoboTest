@@ -140,7 +140,7 @@ fi
 # Obtain the list of test IDs
 TEST_SPECS_DIR="tests"
 declare TESTS_LIST=($(ls "${TEST_SPECS_DIR}" | sed -e 's|\.json||'))
-TEST_RUN=1
+TEST_RUN=$(($(cat ${FINISHED_TESTS_FP} | wc -l)+1))
 for TEST_ID in "${TESTS_LIST[@]}"
 do
     echo -e "\n[Checking if the test ${TEST_ID} has been run before]"
