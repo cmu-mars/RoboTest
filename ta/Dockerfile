@@ -1,4 +1,5 @@
-FROM cmumars/p3-cp1_rb
+#FROM cmumars/p3-cp1_rb
+FROM rainbow
 
 RUN . /opt/ros/kinetic/setup.sh
 RUN . ~/catkin_ws/devel/setup.sh
