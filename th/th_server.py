@@ -618,7 +618,7 @@ def start_mission_req(src, endpoint, logger):
         return False
 
     status_code = response.status_code
-    if status_code == 200:
+    if status_code == 200 or status_code == 204: # 204 - response body has no content
         logger.info(f"Mission is started in TA")
         can_perturb.set()
         return True
